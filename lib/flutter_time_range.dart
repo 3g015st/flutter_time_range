@@ -124,12 +124,15 @@ class TimeRangePicker extends StatefulWidget {
 
   final Color operationsOverlayColor;
 
+  final double height;
+
   TimeRangePicker(
       {Key? key,
       @required this.initialFromHour,
       @required this.initialToHour,
       @required this.initialFromMinutes,
       @required this.initialToMinutes,
+      this.height = 400.0,
       this.tabBarBorderRadius = 0,
       this.onSelect,
       this.onCancel,
@@ -174,6 +177,7 @@ class TimeRangePicker extends StatefulWidget {
 
 class _TimeRangePickerState extends State<TimeRangePicker>
     with SingleTickerProviderStateMixin {
+  double height = 400;
   int tabBarBorderRadius = 0;
 
   BorderRadius _tabBarBorderRadius = BorderRadius.only(
@@ -190,7 +194,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
   int _selectedTab = 0;
   int _maxJamValue = 23;
   int _minJamValue = 0;
-  
+
   BoxDecoration defaultDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(7),
       border: Border.all(color: Colors.grey[500]!));
@@ -203,6 +207,8 @@ class _TimeRangePickerState extends State<TimeRangePicker>
   @override
   void initState() {
     super.initState();
+
+    height = widget.height;
 
     tabBarBorderRadius = widget.tabBarBorderRadius;
 
@@ -287,7 +293,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
   Widget buildContainer() {
     return Container(
       width: double.maxFinite,
-      height: 330,
+      height: height,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -371,136 +377,144 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                     },
                                   ),
                                 ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  decoration: widget.timeContainerStyle ??
-                                      defaultDecoration,
-                                  child: isEdit[0]
-                                      ? TextField(
-                                          controller: textControllers[0],
-                                          focusNode: textFocus[0],
-                                          textAlign: TextAlign.center,
-                                          style: widget.selectedTimeStyle,
-                                          decoration: InputDecoration(
-                                              border: InputBorder.none),
-                                          keyboardType:
-                                              TextInputType.numberWithOptions(
-                                                  signed: true),
-                                          inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter.allow(
-                                                RegExp(r'[0-9]')),
-                                          ],
-                                          onSubmitted: (value) {
-                                            setState(() {
-                                              if (value.isNotEmpty) {
-                                                if (int.parse(value) >
-                                                    _maxJamValue) {
-                                                  _jamFrom = _maxJamValue;
-                                                } else {
-                                                  _jamFrom = int.parse(value);
-                                                }
-                                              }
-
-                                              isEdit[0] = false;
-                                            });
-                                          },
-                                        )
-                                      : InkWell(
-                                          onTap: () {
-                                            if (widget.editable) {
-                                              setState(() {
-                                                isEdit[0] = true;
-                                                textFocus[0].requestFocus();
-                                              });
-                                            }
-                                          },
-                                          child: NumberPicker(
-                                              minValue: _minJamValue,
-                                              maxValue: _maxJamValue,
-                                              value: _jamFrom,
-                                              zeroPad: true,
-                                              textStyle:
-                                                  widget.unselectedTimeStyle,
-                                              selectedTextStyle:
-                                                  widget.selectedTimeStyle,
-                                              infiniteLoop: true,
-                                              onChanged: (value) {
+                          Padding(
+                              padding:
+                                  EdgeInsets.only(left: 10, right: 10, top: 10),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      decoration: widget.timeContainerStyle ??
+                                          defaultDecoration,
+                                      child: isEdit[0]
+                                          ? TextField(
+                                              controller: textControllers[0],
+                                              focusNode: textFocus[0],
+                                              textAlign: TextAlign.center,
+                                              style: widget.selectedTimeStyle,
+                                              decoration: InputDecoration(
+                                                  border: InputBorder.none),
+                                              keyboardType: TextInputType
+                                                  .numberWithOptions(
+                                                      signed: true),
+                                              inputFormatters: <
+                                                  TextInputFormatter>[
+                                                FilteringTextInputFormatter
+                                                    .allow(RegExp(r'[0-9]')),
+                                              ],
+                                              onSubmitted: (value) {
                                                 setState(() {
-                                                  _jamFrom = value;
-                                                });
-                                              }),
-                                        ),
-                                ),
-                              ),
-                              Padding(
-                                  padding: EdgeInsets.only(left: 10, right: 10),
-                                  child:
-                                      Text(":", style: widget.separatorStyle)),
-                              Expanded(
-                                child: Container(
-                                  decoration: widget.timeContainerStyle ??
-                                      defaultDecoration,
-                                  child: isEdit[1]
-                                      ? TextField(
-                                          controller: textControllers[1],
-                                          focusNode: textFocus[1],
-                                          textAlign: TextAlign.center,
-                                          style: widget.selectedTimeStyle,
-                                          decoration: InputDecoration(
-                                              border: InputBorder.none),
-                                          keyboardType:
-                                              TextInputType.numberWithOptions(
-                                                  signed: true),
-                                          inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter.allow(
-                                                RegExp(r'[0-9]')),
-                                          ],
-                                          onSubmitted: (value) {
-                                            setState(() {
-                                              if (value.isNotEmpty) {
-                                                if (int.parse(value) > 59) {
-                                                  _menitFrom = 59;
-                                                } else {
-                                                  _menitFrom = int.parse(value);
-                                                }
-                                              }
+                                                  if (value.isNotEmpty) {
+                                                    if (int.parse(value) >
+                                                        _maxJamValue) {
+                                                      _jamFrom = _maxJamValue;
+                                                    } else {
+                                                      _jamFrom =
+                                                          int.parse(value);
+                                                    }
+                                                  }
 
-                                              isEdit[1] = false;
-                                            });
-                                          },
-                                        )
-                                      : InkWell(
-                                          onTap: () {
-                                            if (widget.editable) {
-                                              setState(() {
-                                                isEdit[1] = true;
-                                                textFocus[1].requestFocus();
-                                              });
-                                            }
-                                          },
-                                          child: NumberPicker(
-                                              minValue: 0,
-                                              maxValue: 59,
-                                              value: _menitFrom,
-                                              zeroPad: true,
-                                              textStyle:
-                                                  widget.unselectedTimeStyle,
-                                              selectedTextStyle:
-                                                  widget.selectedTimeStyle,
-                                              infiniteLoop: true,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _menitFrom = value;
+                                                  isEdit[0] = false;
                                                 });
-                                              }),
-                                        ),
-                                ),
-                              ),
-                            ],
-                          ),
+                                              },
+                                            )
+                                          : InkWell(
+                                              onTap: () {
+                                                if (widget.editable) {
+                                                  setState(() {
+                                                    isEdit[0] = true;
+                                                    textFocus[0].requestFocus();
+                                                  });
+                                                }
+                                              },
+                                              child: NumberPicker(
+                                                  minValue: _minJamValue,
+                                                  maxValue: _maxJamValue,
+                                                  value: _jamFrom,
+                                                  zeroPad: true,
+                                                  textStyle: widget
+                                                      .unselectedTimeStyle,
+                                                  selectedTextStyle:
+                                                      widget.selectedTimeStyle,
+                                                  infiniteLoop: true,
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      _jamFrom = value;
+                                                    });
+                                                  }),
+                                            ),
+                                    ),
+                                  ),
+                                  Padding(
+                                      padding:
+                                          EdgeInsets.only(left: 10, right: 10),
+                                      child: Text(":",
+                                          style: widget.separatorStyle)),
+                                  Expanded(
+                                    child: Container(
+                                      decoration: widget.timeContainerStyle ??
+                                          defaultDecoration,
+                                      child: isEdit[1]
+                                          ? TextField(
+                                              controller: textControllers[1],
+                                              focusNode: textFocus[1],
+                                              textAlign: TextAlign.center,
+                                              style: widget.selectedTimeStyle,
+                                              decoration: InputDecoration(
+                                                  border: InputBorder.none),
+                                              keyboardType: TextInputType
+                                                  .numberWithOptions(
+                                                      signed: true),
+                                              inputFormatters: <
+                                                  TextInputFormatter>[
+                                                FilteringTextInputFormatter
+                                                    .allow(RegExp(r'[0-9]')),
+                                              ],
+                                              onSubmitted: (value) {
+                                                setState(() {
+                                                  if (value.isNotEmpty) {
+                                                    if (int.parse(value) > 59) {
+                                                      _menitFrom = 59;
+                                                    } else {
+                                                      _menitFrom =
+                                                          int.parse(value);
+                                                    }
+                                                  }
+
+                                                  isEdit[1] = false;
+                                                });
+                                              },
+                                            )
+                                          : InkWell(
+                                              onTap: () {
+                                                if (widget.editable) {
+                                                  setState(() {
+                                                    isEdit[1] = true;
+                                                    textFocus[1].requestFocus();
+                                                  });
+                                                }
+                                              },
+                                              child: NumberPicker(
+                                                  minValue: 0,
+                                                  maxValue: 59,
+                                                  value: _menitFrom,
+                                                  zeroPad: true,
+                                                  textStyle: widget
+                                                      .unselectedTimeStyle,
+                                                  selectedTextStyle:
+                                                      widget.selectedTimeStyle,
+                                                  infiniteLoop: true,
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      _menitFrom = value;
+                                                    });
+                                                  }),
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              )),
                         ],
                       ),
                     ),
@@ -671,117 +685,120 @@ class _TimeRangePickerState extends State<TimeRangePicker>
               ),
             ),
           ),
-          Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                TextButton(
-                    style: ButtonStyle(
-                      overlayColor: MaterialStateProperty.all(
-                          widget.operationsOverlayColor),
-                    ),
-                    onPressed: () {
-                      if (_selectedTab == 1) {
-                        _tabController.animateTo(0);
-                      } else {
-                        widget.onCancel?.call();
-                      }
-                    },
-                    child: Row(
-                      children: [
-                        _selectedTab == 0
-                            ? widget.iconCancel ?? Container()
-                            : widget.iconBack ?? Container(),
-                        Padding(padding: EdgeInsets.only(right: 5)),
-                        Text(
-                            _selectedTab == 0
-                                ? widget.cancelText
-                                : widget.backText,
-                            style: widget.operationsTextStyle)
-                      ],
-                    )),
-                TextButton(
-                    style: ButtonStyle(
-                      overlayColor: MaterialStateProperty.all(
-                          widget.operationsOverlayColor),
-                    ),
-                    onPressed: () {
-                      if (_selectedTab == 0) {
-                        _tabController.animateTo(1);
-                      } else {
-                        if (isEdit[0]) {
-                          if (textControllers[0].text.isNotEmpty) {
-                            if (int.parse(textControllers[0].text) >
-                                _maxJamValue) {
-                              _jamFrom = _maxJamValue;
-                            } else {
-                              _jamFrom = int.parse(textControllers[0].text);
+          Padding(
+            padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+            child: Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  TextButton(
+                      style: ButtonStyle(
+                        overlayColor: MaterialStateProperty.all(
+                            widget.operationsOverlayColor),
+                      ),
+                      onPressed: () {
+                        if (_selectedTab == 1) {
+                          _tabController.animateTo(0);
+                        } else {
+                          widget.onCancel?.call();
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          _selectedTab == 0
+                              ? widget.iconCancel ?? Container()
+                              : widget.iconBack ?? Container(),
+                          Padding(padding: EdgeInsets.only(right: 5)),
+                          Text(
+                              _selectedTab == 0
+                                  ? widget.cancelText
+                                  : widget.backText,
+                              style: widget.operationsTextStyle)
+                        ],
+                      )),
+                  TextButton(
+                      style: ButtonStyle(
+                        overlayColor: MaterialStateProperty.all(
+                            widget.operationsOverlayColor),
+                      ),
+                      onPressed: () {
+                        if (_selectedTab == 0) {
+                          _tabController.animateTo(1);
+                        } else {
+                          if (isEdit[0]) {
+                            if (textControllers[0].text.isNotEmpty) {
+                              if (int.parse(textControllers[0].text) >
+                                  _maxJamValue) {
+                                _jamFrom = _maxJamValue;
+                              } else {
+                                _jamFrom = int.parse(textControllers[0].text);
+                              }
                             }
                           }
-                        }
 
-                        if (isEdit[2]) {
-                          if (textControllers[2].text.isNotEmpty) {
-                            if (int.parse(textControllers[2].text) >
-                                _maxJamValue) {
-                              _jamTo = _maxJamValue;
-                            } else {
-                              _jamTo = int.parse(textControllers[2].text);
+                          if (isEdit[2]) {
+                            if (textControllers[2].text.isNotEmpty) {
+                              if (int.parse(textControllers[2].text) >
+                                  _maxJamValue) {
+                                _jamTo = _maxJamValue;
+                              } else {
+                                _jamTo = int.parse(textControllers[2].text);
+                              }
                             }
                           }
-                        }
 
-                        if (isEdit[1]) {
-                          if (textControllers[1].text.isNotEmpty) {
-                            if (int.parse(textControllers[1].text) > 59) {
-                              _menitFrom = 59;
-                            } else {
-                              _menitFrom = int.parse(textControllers[1].text);
+                          if (isEdit[1]) {
+                            if (textControllers[1].text.isNotEmpty) {
+                              if (int.parse(textControllers[1].text) > 59) {
+                                _menitFrom = 59;
+                              } else {
+                                _menitFrom = int.parse(textControllers[1].text);
+                              }
                             }
                           }
-                        }
 
-                        if (isEdit[3]) {
-                          if (textControllers[3].text.isNotEmpty) {
-                            if (int.parse(textControllers[3].text) > 59) {
-                              _menitTo = 59;
-                            } else {
-                              _menitTo = int.parse(textControllers[3].text);
+                          if (isEdit[3]) {
+                            if (textControllers[3].text.isNotEmpty) {
+                              if (int.parse(textControllers[3].text) > 59) {
+                                _menitTo = 59;
+                              } else {
+                                _menitTo = int.parse(textControllers[3].text);
+                              }
                             }
                           }
+
+                          var jamFr = widget.is24Format
+                              ? _jamFrom
+                              : fromIndex == 1
+                                  ? (_jamFrom + 12)
+                                  : _jamFrom;
+
+                          var jamTo = widget.is24Format
+                              ? _jamTo
+                              : toIndex == 1
+                                  ? (_jamTo + 12)
+                                  : _jamTo;
+                          widget.onSelect?.call(
+                              TimeOfDay(hour: jamFr, minute: _menitFrom),
+                              TimeOfDay(hour: jamTo, minute: _menitTo));
                         }
-
-                        var jamFr = widget.is24Format
-                            ? _jamFrom
-                            : fromIndex == 1
-                                ? (_jamFrom + 12)
-                                : _jamFrom;
-
-                        var jamTo = widget.is24Format
-                            ? _jamTo
-                            : toIndex == 1
-                                ? (_jamTo + 12)
-                                : _jamTo;
-                        widget.onSelect?.call(
-                            TimeOfDay(hour: jamFr, minute: _menitFrom),
-                            TimeOfDay(hour: jamTo, minute: _menitTo));
-                      }
-                    },
-                    child: Row(
-                      children: [
-                        _selectedTab == 0
-                            ? widget.iconNext ?? Container()
-                            : widget.iconSelect ?? Container(),
-                        Padding(padding: EdgeInsets.only(right: 5)),
-                        Text(
-                            _selectedTab == 0
-                                ? widget.nextText
-                                : widget.selectText,
-                            style: widget.operationsTextStyle),
-                      ],
-                    ))
-              ],
+                      },
+                      child: Row(
+                        children: [
+                          _selectedTab == 0
+                              ? widget.iconNext ?? Container()
+                              : widget.iconSelect ?? Container(),
+                          Padding(padding: EdgeInsets.only(right: 5)),
+                          Text(
+                              _selectedTab == 0
+                                  ? widget.nextText
+                                  : widget.selectText,
+                              style: widget.operationsTextStyle),
+                        ],
+                      ))
+                ],
+              ),
             ),
           )
         ],
