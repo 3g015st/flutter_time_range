@@ -126,12 +126,16 @@ class TimeRangePicker extends StatefulWidget {
 
   final double height;
 
+  final TextStyle errorMessageTextStyle;
+
   TimeRangePicker(
       {Key? key,
       @required this.initialFromHour,
       @required this.initialToHour,
       @required this.initialFromMinutes,
       @required this.initialToMinutes,
+      this.errorMessageTextStyle =
+          const TextStyle(color: Colors.red, fontSize: 12),
       this.height = 400.0,
       this.tabBarBorderRadius = 0,
       this.onSelect,
@@ -177,6 +181,7 @@ class TimeRangePicker extends StatefulWidget {
 
 class _TimeRangePickerState extends State<TimeRangePicker>
     with SingleTickerProviderStateMixin {
+  String errorMessage = "";
   double height = 400;
   int tabBarBorderRadius = 0;
 
@@ -340,9 +345,13 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                       Tab(text: widget.tabToText)
                     ],
                   )),
+          if (errorMessage != "")
+            Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Text(errorMessage, style: widget.errorMessageTextStyle)),
           Expanded(
             child: Container(
-              padding: EdgeInsets.only(top: 20),
+              padding: EdgeInsets.only(top: 10),
               child: TabBarView(
                 physics: widget.disableTabInteraction
                     ? NeverScrollableScrollPhysics()
@@ -360,7 +369,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                   height: 30,
                                 )
                               : Padding(
-                                  padding: EdgeInsets.only(bottom: 20),
+                                  padding: EdgeInsets.only(bottom: 25),
                                   child: ToggleSwitch(
                                     fontSize: 12,
                                     minWidth: 90.0,
@@ -439,6 +448,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                                       widget.selectedTimeStyle,
                                                   infiniteLoop: true,
                                                   onChanged: (value) {
+                                                    resetErrorMessage();
                                                     setState(() {
                                                       _jamFrom = value;
                                                     });
@@ -506,6 +516,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                                       widget.selectedTimeStyle,
                                                   infiniteLoop: true,
                                                   onChanged: (value) {
+                                                    resetErrorMessage();
                                                     setState(() {
                                                       _menitFrom = value;
                                                     });
@@ -530,7 +541,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                   height: 30,
                                 )
                               : Padding(
-                                  padding: EdgeInsets.only(bottom: 20),
+                                  padding: EdgeInsets.only(bottom: 35),
                                   child: ToggleSwitch(
                                     fontSize: 12,
                                     minWidth: 90.0,
@@ -604,6 +615,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                                   widget.selectedTimeStyle,
                                               infiniteLoop: true,
                                               onChanged: (value) {
+                                                resetErrorMessage();
                                                 setState(() {
                                                   _jamTo = value;
                                                 });
@@ -668,6 +680,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                                   widget.selectedTimeStyle,
                                               infiniteLoop: true,
                                               onChanged: (value) {
+                                                resetErrorMessage();
                                                 setState(() {
                                                   _menitTo = value;
                                                 });
@@ -779,9 +792,21 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                               : toIndex == 1
                                   ? (_jamTo + 12)
                                   : _jamTo;
-                          widget.onSelect?.call(
-                              TimeOfDay(hour: jamFr, minute: _menitFrom),
-                              TimeOfDay(hour: jamTo, minute: _menitTo));
+
+                          if (isValidTime(
+                              fromHour: jamFr,
+                              fromMinute: _menitFrom,
+                              toHour: jamTo,
+                              toMinute: _menitTo)) {
+                            widget.onSelect?.call(
+                                TimeOfDay(hour: jamFr, minute: _menitFrom),
+                                TimeOfDay(hour: jamTo, minute: _menitTo));
+                          } else {
+                            setState(() {
+                              errorMessage =
+                                  "Start time is greater than end time";
+                            });
+                          }
                         }
                       },
                       child: Row(
@@ -804,5 +829,24 @@ class _TimeRangePickerState extends State<TimeRangePicker>
         ],
       ),
     );
+  }
+
+  bool isValidTime(
+      {required int fromHour,
+      required int fromMinute,
+      required int toHour,
+      required int toMinute}) {
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day, fromHour, fromMinute);
+    final end = DateTime(now.year, now.month, now.day, toHour, toMinute);
+    return start.compareTo(end) < 0;
+  }
+
+  void resetErrorMessage() {
+    if (errorMessage != "") {
+      setState(() {
+        errorMessage = "";
+      });
+    }
   }
 }
