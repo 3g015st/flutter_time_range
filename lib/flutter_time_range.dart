@@ -109,6 +109,8 @@ class TimeRangePicker extends StatefulWidget {
   /// TextStyle of inactive tab bar
   final TextStyle inactiveTabStyle;
 
+  final TextStyle operationsTextStyle;
+
   /// Color of active tab label
   final Color activeLabelColor;
 
@@ -118,12 +120,17 @@ class TimeRangePicker extends StatefulWidget {
   /// Color of indicator active tab
   final Color indicatorColor;
 
+  final int tabBarBorderRadius;
+
+  final Color operationsOverlayColor;
+
   TimeRangePicker(
       {Key? key,
       @required this.initialFromHour,
       @required this.initialToHour,
       @required this.initialFromMinutes,
       @required this.initialToMinutes,
+      this.tabBarBorderRadius = 0,
       this.onSelect,
       this.onCancel,
       this.tabFromText = "From",
@@ -153,8 +160,11 @@ class TimeRangePicker extends StatefulWidget {
           const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
       this.inactiveTabStyle =
           const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
-      this.activeLabelColor = Colors.blueAccent,
-      this.inactiveLabelColor = Colors.grey,
+      this.operationsTextStyle =
+          const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
+      this.operationsOverlayColor = Colors.blue,
+      this.activeLabelColor = Colors.white,
+      this.inactiveLabelColor = Colors.black,
       this.indicatorColor = Colors.blueAccent})
       : super(key: key);
 
@@ -164,6 +174,14 @@ class TimeRangePicker extends StatefulWidget {
 
 class _TimeRangePickerState extends State<TimeRangePicker>
     with SingleTickerProviderStateMixin {
+  int tabBarBorderRadius = 0;
+
+  BorderRadius _tabBarBorderRadius = BorderRadius.only(
+      topLeft: Radius.circular(0), topRight: Radius.circular(0));
+
+  BorderRadius _tabBarSplashBorderRadius = BorderRadius.only(
+      topLeft: Radius.circular(0), topRight: Radius.circular(0));
+
   late TabController _tabController;
   int _jamFrom = 0;
   int _menitFrom = 0;
@@ -172,6 +190,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
   int _selectedTab = 0;
   int _maxJamValue = 23;
   int _minJamValue = 0;
+  
   BoxDecoration defaultDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(7),
       border: Border.all(color: Colors.grey[500]!));
@@ -184,10 +203,37 @@ class _TimeRangePickerState extends State<TimeRangePicker>
   @override
   void initState() {
     super.initState();
+
+    tabBarBorderRadius = widget.tabBarBorderRadius;
+
+    _tabBarBorderRadius = BorderRadius.only(
+        topLeft: Radius.circular(widget.tabBarBorderRadius.toDouble()),
+        topRight: Radius.circular(0));
+
+    _tabBarSplashBorderRadius = BorderRadius.only(
+        topLeft: Radius.circular(0),
+        topRight: Radius.circular(widget.tabBarBorderRadius.toDouble()));
+
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       setState(() {
         _selectedTab = _tabController.index;
+
+        if (_selectedTab == 1) {
+          _tabBarBorderRadius = BorderRadius.only(
+              topRight: Radius.circular(tabBarBorderRadius.toDouble()),
+              topLeft: Radius.circular(0));
+          _tabBarSplashBorderRadius = BorderRadius.only(
+              topRight: Radius.circular(0),
+              topLeft: Radius.circular(tabBarBorderRadius.toDouble()));
+        } else {
+          _tabBarBorderRadius = BorderRadius.only(
+              topLeft: Radius.circular(tabBarBorderRadius.toDouble()),
+              topRight: Radius.circular(0));
+          _tabBarSplashBorderRadius = BorderRadius.only(
+              topLeft: Radius.circular(0),
+              topRight: Radius.circular(tabBarBorderRadius.toDouble()));
+        }
       });
     });
 
@@ -247,31 +293,47 @@ class _TimeRangePickerState extends State<TimeRangePicker>
         children: [
           widget.disableTabInteraction
               ? IgnorePointer(
+                  child: Theme(
+                      data: ThemeData().copyWith(
+                          splashColor: widget.indicatorColor,
+                          highlightColor: widget.indicatorColor),
+                      child: TabBar(
+                        controller: _tabController,
+                        labelStyle: widget.activeTabStyle,
+                        unselectedLabelStyle: widget.inactiveTabStyle,
+                        indicatorColor: Colors.transparent,
+                        labelColor: widget.activeLabelColor,
+                        unselectedLabelColor: widget.inactiveLabelColor,
+                        splashBorderRadius: _tabBarSplashBorderRadius,
+                        indicator: BoxDecoration(
+                            color: widget.indicatorColor,
+                            borderRadius: _tabBarBorderRadius),
+                        tabs: [
+                          Tab(text: widget.tabFromText),
+                          Tab(text: widget.tabToText)
+                        ],
+                      )),
+                )
+              : Theme(
+                  data: ThemeData().copyWith(
+                      splashColor: widget.indicatorColor,
+                      highlightColor: widget.indicatorColor),
                   child: TabBar(
                     controller: _tabController,
                     labelStyle: widget.activeTabStyle,
-                    labelColor: widget.activeLabelColor,
-                    indicatorColor: widget.indicatorColor,
-                    unselectedLabelColor: widget.inactiveLabelColor,
                     unselectedLabelStyle: widget.inactiveTabStyle,
+                    indicatorColor: Colors.transparent,
+                    labelColor: widget.activeLabelColor,
+                    unselectedLabelColor: widget.inactiveLabelColor,
+                    splashBorderRadius: _tabBarSplashBorderRadius,
+                    indicator: BoxDecoration(
+                        color: widget.indicatorColor,
+                        borderRadius: _tabBarBorderRadius),
                     tabs: [
                       Tab(text: widget.tabFromText),
                       Tab(text: widget.tabToText)
                     ],
-                  ),
-                )
-              : TabBar(
-                  controller: _tabController,
-                  labelStyle: widget.activeTabStyle,
-                  unselectedLabelStyle: widget.inactiveTabStyle,
-                  indicatorColor: widget.indicatorColor,
-                  labelColor: widget.activeLabelColor,
-                  unselectedLabelColor: widget.inactiveLabelColor,
-                  tabs: [
-                    Tab(text: widget.tabFromText),
-                    Tab(text: widget.tabToText)
-                  ],
-                ),
+                  )),
           Expanded(
             child: Container(
               padding: EdgeInsets.only(top: 20),
@@ -294,6 +356,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                               : Padding(
                                   padding: EdgeInsets.only(bottom: 20),
                                   child: ToggleSwitch(
+                                    fontSize: 12,
                                     minWidth: 90.0,
                                     minHeight: 30,
                                     cornerRadius: 20.0,
@@ -455,6 +518,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                               : Padding(
                                   padding: EdgeInsets.only(bottom: 20),
                                   child: ToggleSwitch(
+                                    fontSize: 12,
                                     minWidth: 90.0,
                                     minHeight: 30,
                                     cornerRadius: 20.0,
@@ -613,6 +677,10 @@ class _TimeRangePickerState extends State<TimeRangePicker>
               mainAxisSize: MainAxisSize.max,
               children: [
                 TextButton(
+                    style: ButtonStyle(
+                      overlayColor: MaterialStateProperty.all(
+                          widget.operationsOverlayColor),
+                    ),
                     onPressed: () {
                       if (_selectedTab == 1) {
                         _tabController.animateTo(0);
@@ -626,12 +694,18 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                             ? widget.iconCancel ?? Container()
                             : widget.iconBack ?? Container(),
                         Padding(padding: EdgeInsets.only(right: 5)),
-                        Text(_selectedTab == 0
-                            ? widget.cancelText
-                            : widget.backText)
+                        Text(
+                            _selectedTab == 0
+                                ? widget.cancelText
+                                : widget.backText,
+                            style: widget.operationsTextStyle)
                       ],
                     )),
                 TextButton(
+                    style: ButtonStyle(
+                      overlayColor: MaterialStateProperty.all(
+                          widget.operationsOverlayColor),
+                    ),
                     onPressed: () {
                       if (_selectedTab == 0) {
                         _tabController.animateTo(1);
@@ -700,9 +774,11 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                             ? widget.iconNext ?? Container()
                             : widget.iconSelect ?? Container(),
                         Padding(padding: EdgeInsets.only(right: 5)),
-                        Text(_selectedTab == 0
-                            ? widget.nextText
-                            : widget.selectText),
+                        Text(
+                            _selectedTab == 0
+                                ? widget.nextText
+                                : widget.selectText,
+                            style: widget.operationsTextStyle),
                       ],
                     ))
               ],

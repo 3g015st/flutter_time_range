@@ -1,10 +1,10 @@
 name: flutter_time_range
-description: A fully customizable flutter widget that allowing users to choose time range (from - to) 
+description: A fully customizable flutter widget that allowing users to choose time range (from - to)
 version: 0.0.3
 homepage: https://github.com/alfanthariq/flutter_time_range
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
   flutter: ">=1.17.0"
 
 dependencies:

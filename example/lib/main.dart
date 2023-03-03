@@ -57,8 +57,8 @@ class MyAppState extends State<MyApp> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Choose event time"),
             content: TimeRangePicker(
+              operationsTextStyle: TextStyle(color: Colors.black),
               initialFromHour: DateTime.now().hour,
               initialFromMinutes: DateTime.now().minute,
               initialToHour: DateTime.now().hour,
@@ -91,8 +91,12 @@ class MyAppState extends State<MyApp> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Choose event time"),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(25.0))),
+            contentPadding: EdgeInsets.zero,
             content: TimeRangePicker(
+              operationsTextStyle: TextStyle(color: Colors.black),
+              tabBarBorderRadius: 10,
               initialFromHour: DateTime.now().hour,
               initialFromMinutes: DateTime.now().minute,
               initialToHour: DateTime.now().hour,
@@ -103,11 +107,11 @@ class MyAppState extends State<MyApp> {
               selectText: "Select",
               editable: true,
               is24Format: false,
-              disableTabInteraction: true,
-              iconCancel: Icon(Icons.cancel_presentation, size: 12),
-              iconNext: Icon(Icons.arrow_forward, size: 12),
-              iconBack: Icon(Icons.arrow_back, size: 12),
-              iconSelect: Icon(Icons.check, size: 12),
+              disableTabInteraction: false,
+              iconCancel: Icon(Icons.cancel_presentation, size: 0),
+              iconNext: Icon(Icons.arrow_forward, size: 0),
+              iconBack: Icon(Icons.arrow_back, size: 0),
+              iconSelect: Icon(Icons.check, size: 0),
               inactiveBgColor: Colors.grey[800],
               timeContainerStyle: BoxDecoration(
                   color: Colors.grey[800],
