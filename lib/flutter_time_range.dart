@@ -804,7 +804,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                           } else {
                             setState(() {
                               errorMessage =
-                                  "Start time is greater than end time";
+                                  "Start time is greater than or equal to end time";
                             });
                           }
                         }
@@ -839,7 +839,8 @@ class _TimeRangePickerState extends State<TimeRangePicker>
     final now = DateTime.now();
     final start = DateTime(now.year, now.month, now.day, fromHour, fromMinute);
     final end = DateTime(now.year, now.month, now.day, toHour, toMinute);
-    return start.compareTo(end) < 0;
+    final v = start.isBefore(end);
+    return v;
   }
 
   void resetErrorMessage() {
